@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActionPanel, Action, Grid, Detail } from "@raycast/api";
+import { ActionPanel, Action, Grid, Icon, Detail } from "@raycast/api";
 import * as simpleIcons from "simple-icons";
 
 export default function Command() {
@@ -35,6 +35,7 @@ export default function Command() {
             actions={
               <ActionPanel>
                 <Action.Push
+                  icon={Icon.Eye}
                   title="See Detail"
                   target={
                     <Detail
