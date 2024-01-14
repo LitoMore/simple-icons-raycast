@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActionPanel, Action, Grid, Icon, Detail } from "@raycast/api";
+import { ActionPanel, Action, Grid, Icon, Detail, Color } from "@raycast/api";
 import * as simpleIcons from "simple-icons";
 import packageJson from "../package.json";
 
@@ -31,7 +31,7 @@ export default function Command() {
         Object.entries(simpleIcons).map(([name, icon]) => (
           <Grid.Item
             key={name}
-            content={{ value: { source: `icons/${icon.slug}.svg` }, tooltip: name }}
+            content={{ value: { source: `icons/${icon.slug}.svg`, tintColor: Color.PrimaryText }, tooltip: name }}
             title={icon.title}
             actions={
               <ActionPanel>
@@ -57,8 +57,8 @@ export default function Command() {
                           {icon.license && (
                             <Detail.Metadata.Link
                               title="License"
-                              target={icon.license.url as string}
-                              text={icon.license.type === "custom" ? (icon.license.url as string) : icon.license.type}
+                              target={icon.license.url}
+                              text={icon.license.type === "custom" ? icon.license.url : icon.license.type}
                             />
                           )}
                         </Detail.Metadata>
