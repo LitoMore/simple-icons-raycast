@@ -89,7 +89,7 @@ export default function Command() {
                     title="See Detail"
                     target={
                       <Detail
-                        markdown={`<img src="https://cdn.simpleicons.org/${slug}?raycast-width=235&raycast-height=235"  />`}
+                        markdown={`<img src="https://cdn.simpleicons.org/${slug}?raycast-width=325&raycast-height=325"  />`}
                         navigationTitle={icon.title}
                         metadata={
                           <Detail.Metadata>
