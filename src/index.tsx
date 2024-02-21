@@ -21,7 +21,9 @@ export default function Command() {
       });
 
       const version = await loadLatestVersion();
+      console.log(version);
       const cached = cache.get(`json-${version}`);
+      console.log(Boolean(cached));
       const json: IconJson = cached ? JSON.parse(cached) : await loadJson(version);
 
       if (!cached) {
@@ -137,12 +139,12 @@ export default function Command() {
                             />
                             <Action.CopyToClipboard
                               title="Copy jsDelivr CDN Link"
-                              content={`https://cdn.jsdelivr.net/npm/simple-icons@${packageJson.dependencies["simple-icons"]}/icons/${slug}.svg`}
+                              content={`https://cdn.jsdelivr.net/npm/simple-icons@${version}/icons/${slug}.svg`}
                             />
                             <Action.CopyToClipboard
                               // eslint-disable-next-line @raycast/prefer-title-case
                               title="Copy unpkg CDN Link"
-                              content={`https://unpkg.com/simple-icons@${packageJson.dependencies["simple-icons"]}/icons/${slug}.svg`}
+                              content={`https://unpkg.com/simple-icons@${version}/icons/${slug}.svg`}
                             />
                           </ActionPanel>
                         }
