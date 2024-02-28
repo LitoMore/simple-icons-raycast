@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActionPanel, Action, Grid, Icon, Detail, Color, Clipboard, Cache, Toast, showToast } from "@raycast/api";
+import { ActionPanel, Action, Grid, Icon, Detail, Clipboard, Cache, Toast, showHUD, showToast } from "@raycast/api";
 import { titleToSlug } from "simple-icons/sdk";
 import { loadLatestVersion, loadJson, loadSvg } from "./utils";
 import { IconJson, IconData } from "./types";
@@ -74,13 +74,17 @@ export default function Command() {
         icons.map((icon) => {
           const slug = icon.slug || titleToSlug(icon.title);
 
+          const simpleIconsCdnLink = `https://cdn.simpleicons.org/${slug}`;
+          const jsdelivrCdnLink = `https://cdn.jsdelivr.net/npm/simple-icons@${version}/icons/${slug}.svg`;
+          const unpkgCdnLink = `https://unpkg.com/simple-icons@${version}/icons/${slug}.svg`;
+
           return (
             <Grid.Item
               key={slug}
               content={{
                 value: {
                   source: `https://cdn.jsdelivr.net/npm/simple-icons@${version}/icons/${slug}.svg`,
-                  tintColor: Color.PrimaryText,
+                  tintColor: `#${icon.hex}`,
                 },
                 tooltip: icon.title,
               }}
@@ -92,14 +96,29 @@ export default function Command() {
                     title="See Detail"
                     target={
                       <Detail
-                        markdown={`<img src="https://cdn.simpleicons.org/${slug}?raycast-width=325&raycast-height=325"  />`}
+                        markdown={`<img src="${jsdelivrCdnLink}?raycast-width=325&raycast-height=325&raycast-tint-color=${icon.hex}" />`}
                         navigationTitle={icon.title}
                         metadata={
                           <Detail.Metadata>
                             <Detail.Metadata.Label title="Title" text={icon.title} />
-                            <Detail.Metadata.Label title="Slug" text={slug} />
+                            <Detail.Metadata.TagList title="Slug">
+                              <Detail.Metadata.TagList.Item
+                                text={icon.slug}
+                                onAction={async () => {
+                                  Clipboard.copy(icon.slug);
+                                  await showHUD("Copied to Clipboard");
+                                }}
+                              />
+                            </Detail.Metadata.TagList>
                             <Detail.Metadata.TagList title="Brand color">
-                              <Detail.Metadata.TagList.Item text={icon.hex} color={`#${icon.hex}`} />
+                              <Detail.Metadata.TagList.Item
+                                text={icon.hex}
+                                color={`#${icon.hex}`}
+                                onAction={async () => {
+                                  Clipboard.copy(icon.hex);
+                                  await showHUD("Copied to Clipboard");
+                                }}
+                              />
                             </Detail.Metadata.TagList>
                             <Detail.Metadata.Separator />
                             <Detail.Metadata.Link title="Source" target={icon.source} text={icon.source} />
@@ -124,8 +143,15 @@ export default function Command() {
                             <Action
                               title="Copy SVG"
                               onAction={async () => {
+                                const toast = await showToast({
+                                  style: Toast.Style.Success,
+                                  title: "",
+                                  message: "Fetching icon SVG...",
+                                });
                                 const svg = await loadSvg(version, slug);
+                                toast.style = Toast.Style.Success;
                                 Clipboard.copy(svg);
+                                await showHUD("Copied to Clipboard");
                               }}
                               icon={Icon.Clipboard}
                             />
@@ -137,17 +163,14 @@ export default function Command() {
                             />
                             <Action.CopyToClipboard
                               title="Copy CDN Link"
-                              content={`https://cdn.simpleicons.org/${slug}`}
+                              content={simpleIconsCdnLink}
                               shortcut={{ modifiers: ["shift"], key: "enter" }}
                             />
-                            <Action.CopyToClipboard
-                              title="Copy jsDelivr CDN Link"
-                              content={`https://cdn.jsdelivr.net/npm/simple-icons@${version}/icons/${slug}.svg`}
-                            />
+                            <Action.CopyToClipboard title="Copy jsDelivr CDN Link" content={jsdelivrCdnLink} />
                             <Action.CopyToClipboard
                               // eslint-disable-next-line @raycast/prefer-title-case
                               title="Copy unpkg CDN Link"
-                              content={`https://unpkg.com/simple-icons@${version}/icons/${slug}.svg`}
+                              content={unpkgCdnLink}
                             />
                           </ActionPanel>
                         }
