@@ -4,8 +4,14 @@ import { titleToSlug } from "simple-icons/sdk";
 import { loadLatestVersion, loadJson, loadSvg } from "./utils";
 import { IconJson, IconData } from "./types";
 
+const itemDisplayColumns = {
+  small: 8,
+  medium: 5,
+  large: 3,
+} as const;
+
 export default function Command() {
-  const [itemSize, setItemSize] = useState<Grid.ItemSize>(Grid.ItemSize.Small);
+  const [itemSize, setItemSize] = useState<keyof typeof itemDisplayColumns>("small");
   const [isLoading, setIsLoading] = useState(true);
   const [version, setVersion] = useState("latest");
   const [icons, setIcons] = useState<IconData[]>([]);
@@ -47,7 +53,7 @@ export default function Command() {
 
   return (
     <Grid
-      itemSize={itemSize}
+      columns={itemDisplayColumns[itemSize]}
       inset={Grid.Inset.Small}
       isLoading={isLoading}
       searchBarAccessory={
@@ -58,9 +64,9 @@ export default function Command() {
             setItemSize(newValue as Grid.ItemSize);
           }}
         >
-          <Grid.Dropdown.Item title="Small" value={Grid.ItemSize.Small} />
-          <Grid.Dropdown.Item title="Medium" value={Grid.ItemSize.Medium} />
-          <Grid.Dropdown.Item title="Large" value={Grid.ItemSize.Large} />
+          <Grid.Dropdown.Item title="Small" value="small" />
+          <Grid.Dropdown.Item title="Medium" value="medium" />
+          <Grid.Dropdown.Item title="Large" value="large" />
         </Grid.Dropdown>
       }
     >
