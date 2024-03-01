@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { ActionPanel, Action, Grid, Icon, Detail, Clipboard, Cache, Toast, showHUD, showToast } from "@raycast/api";
+import { Action, ActionPanel, Cache, Clipboard, Detail, Grid, Icon, Toast, showHUD, showToast } from "@raycast/api";
 import { titleToSlug } from "simple-icons/sdk";
-import { loadLatestVersion, loadJson, loadSvg } from "./utils";
+import { SupportActions, CopySvgAction, OpenWithAction } from "./actions";
+import { loadLatestVersion, loadJson, cleanSavedPaths, initSavePath } from "./utils";
 import { IconJson, IconData } from "./types";
 
 const itemDisplayColumns = {
@@ -30,9 +31,12 @@ export default function Command() {
       const json: IconJson = cached ? JSON.parse(cached) : await loadJson(version);
 
       if (!cached) {
+        cleanSavedPaths();
         cache.clear();
         cache.set(`json-${version}`, JSON.stringify(json));
       }
+
+      await initSavePath(version);
 
       const icons = json.icons.map((icon) => ({
         ...icon,
@@ -91,92 +95,91 @@ export default function Command() {
               title={icon.title}
               actions={
                 <ActionPanel>
-                  <Action.Push
-                    icon={Icon.Eye}
-                    title="See Detail"
-                    target={
-                      <Detail
-                        markdown={`<img src="${jsdelivrCdnLink}?raycast-width=325&raycast-height=325&raycast-tint-color=${icon.hex}" />`}
-                        navigationTitle={icon.title}
-                        metadata={
-                          <Detail.Metadata>
-                            <Detail.Metadata.Label title="Title" text={icon.title} />
-                            <Detail.Metadata.TagList title="Slug">
-                              <Detail.Metadata.TagList.Item
-                                text={icon.slug}
-                                onAction={async () => {
-                                  Clipboard.copy(icon.slug);
-                                  await showHUD("Copied to Clipboard");
-                                }}
-                              />
-                            </Detail.Metadata.TagList>
-                            <Detail.Metadata.TagList title="Brand color">
-                              <Detail.Metadata.TagList.Item
-                                text={icon.hex}
-                                color={`#${icon.hex}`}
-                                onAction={async () => {
-                                  Clipboard.copy(icon.hex);
-                                  await showHUD("Copied to Clipboard");
-                                }}
-                              />
-                            </Detail.Metadata.TagList>
-                            <Detail.Metadata.Separator />
-                            <Detail.Metadata.Link title="Source" target={icon.source} text={icon.source} />
-                            {icon.guidelines && (
-                              <Detail.Metadata.Link
-                                title="Guidelines"
-                                target={icon.guidelines}
-                                text={icon.guidelines}
-                              />
-                            )}
-                            {icon.license && (
-                              <Detail.Metadata.Link
-                                title="License"
-                                target={icon.license.url ?? `https://spdx.org/licenses/${icon.license.type}`}
-                                text={icon.license.url ? icon.license.url : icon.license.type}
-                              />
-                            )}
-                          </Detail.Metadata>
-                        }
-                        actions={
-                          <ActionPanel>
-                            <Action
-                              title="Copy SVG"
-                              onAction={async () => {
-                                const toast = await showToast({
-                                  style: Toast.Style.Success,
-                                  title: "",
-                                  message: "Fetching icon SVG...",
-                                });
-                                const svg = await loadSvg(version, slug);
-                                toast.style = Toast.Style.Success;
-                                Clipboard.copy(svg);
-                                await showHUD("Copied to Clipboard");
-                              }}
-                              icon={Icon.Clipboard}
-                            />
-                            <Action.CopyToClipboard title="Copy Color" content={icon.hex} />
-                            <Action.CopyToClipboard
-                              title="Copy Slug"
-                              content={slug}
-                              shortcut={{ modifiers: ["opt"], key: "enter" }}
-                            />
-                            <Action.CopyToClipboard
-                              title="Copy CDN Link"
-                              content={simpleIconsCdnLink}
-                              shortcut={{ modifiers: ["shift"], key: "enter" }}
-                            />
-                            <Action.CopyToClipboard title="Copy jsDelivr CDN Link" content={jsdelivrCdnLink} />
-                            <Action.CopyToClipboard
-                              // eslint-disable-next-line @raycast/prefer-title-case
-                              title="Copy unpkg CDN Link"
-                              content={unpkgCdnLink}
-                            />
-                          </ActionPanel>
-                        }
-                      />
-                    }
-                  />
+                  <ActionPanel.Section>
+                    <Action.Push
+                      icon={Icon.Eye}
+                      title="See Detail"
+                      target={
+                        <Detail
+                          markdown={`<img src="${jsdelivrCdnLink}?raycast-width=325&raycast-height=325&raycast-tint-color=${icon.hex}" />`}
+                          navigationTitle={icon.title}
+                          metadata={
+                            <Detail.Metadata>
+                              <Detail.Metadata.Label title="Title" text={icon.title} />
+                              <Detail.Metadata.TagList title="Slug">
+                                <Detail.Metadata.TagList.Item
+                                  text={icon.slug}
+                                  onAction={async () => {
+                                    Clipboard.copy(icon.slug);
+                                    await showHUD("Copied to Clipboard");
+                                  }}
+                                />
+                              </Detail.Metadata.TagList>
+                              <Detail.Metadata.TagList title="Brand color">
+                                <Detail.Metadata.TagList.Item
+                                  text={icon.hex}
+                                  color={`#${icon.hex}`}
+                                  onAction={async () => {
+                                    Clipboard.copy(icon.hex);
+                                    await showHUD("Copied to Clipboard");
+                                  }}
+                                />
+                              </Detail.Metadata.TagList>
+                              <Detail.Metadata.Separator />
+                              <Detail.Metadata.Link title="Source" target={icon.source} text={icon.source} />
+                              {icon.guidelines && (
+                                <Detail.Metadata.Link
+                                  title="Guidelines"
+                                  target={icon.guidelines}
+                                  text={icon.guidelines}
+                                />
+                              )}
+                              {icon.license && (
+                                <Detail.Metadata.Link
+                                  title="License"
+                                  target={icon.license.url ?? `https://spdx.org/licenses/${icon.license.type}`}
+                                  text={icon.license.url ? icon.license.url : icon.license.type}
+                                />
+                              )}
+                            </Detail.Metadata>
+                          }
+                          actions={
+                            <ActionPanel>
+                              <ActionPanel.Section>
+                                <CopySvgAction slug={slug} version={version} />
+                                <Action.CopyToClipboard title="Copy Color" content={icon.hex} />
+                                <Action.CopyToClipboard
+                                  title="Copy Slug"
+                                  content={slug}
+                                  shortcut={{ modifiers: ["opt"], key: "enter" }}
+                                />
+                                <Action.CopyToClipboard
+                                  title="Copy CDN Link"
+                                  content={simpleIconsCdnLink}
+                                  shortcut={{ modifiers: ["shift"], key: "enter" }}
+                                />
+                                <Action.CopyToClipboard title="Copy jsDelivr CDN Link" content={jsdelivrCdnLink} />
+                                <Action.CopyToClipboard
+                                  // eslint-disable-next-line @raycast/prefer-title-case
+                                  title="Copy unpkg CDN Link"
+                                  content={unpkgCdnLink}
+                                />
+                              </ActionPanel.Section>
+                              <ActionPanel.Section>
+                                <OpenWithAction slug={slug} version={version} />
+                              </ActionPanel.Section>
+                              <ActionPanel.Section>
+                                <SupportActions />
+                              </ActionPanel.Section>
+                            </ActionPanel>
+                          }
+                        />
+                      }
+                    />
+                  </ActionPanel.Section>
+                  <ActionPanel.Section>
+                    <SupportActions />
+                  </ActionPanel.Section>
                 </ActionPanel>
               }
             />
