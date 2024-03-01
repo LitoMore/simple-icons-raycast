@@ -49,7 +49,6 @@ export const initSavePath = async (version: string) => {
   try {
     await access(savePath, constants.R_OK | constants.W_OK);
   } catch {
-    console.log("test", savePath);
     await mkdir(savePath);
   }
 };

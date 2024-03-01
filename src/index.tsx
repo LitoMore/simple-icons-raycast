@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Action, ActionPanel, Cache, Clipboard, Detail, Grid, Icon, Toast, showHUD, showToast } from "@raycast/api";
 import { titleToSlug } from "simple-icons/sdk";
-import { SupportActions, CopySvgAction, OpenWithAction } from "./actions";
+import { Supports, CopySvg, OpenWith } from "./actions";
 import { loadLatestVersion, loadJson, cleanSavedPaths, initSavePath } from "./utils";
 import { IconJson, IconData } from "./types";
 
@@ -146,7 +146,7 @@ export default function Command() {
                           actions={
                             <ActionPanel>
                               <ActionPanel.Section>
-                                <CopySvgAction slug={slug} version={version} />
+                                <CopySvg slug={slug} version={version} />
                                 <Action.CopyToClipboard title="Copy Color" content={icon.hex} />
                                 <Action.CopyToClipboard
                                   title="Copy Slug"
@@ -166,10 +166,10 @@ export default function Command() {
                                 />
                               </ActionPanel.Section>
                               <ActionPanel.Section>
-                                <OpenWithAction slug={slug} version={version} />
+                                <OpenWith slug={slug} version={version} />
                               </ActionPanel.Section>
                               <ActionPanel.Section>
-                                <SupportActions />
+                                <Supports />
                               </ActionPanel.Section>
                             </ActionPanel>
                           }
@@ -178,7 +178,7 @@ export default function Command() {
                     />
                   </ActionPanel.Section>
                   <ActionPanel.Section>
-                    <SupportActions />
+                    <Supports />
                   </ActionPanel.Section>
                 </ActionPanel>
               }

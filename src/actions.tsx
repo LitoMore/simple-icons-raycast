@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Action, Clipboard, Icon, Toast, showHUD, showToast } from "@raycast/api";
 import { loadSvg, makeCopyToDownload } from "./utils";
 
-export const CopySvgAction = ({ slug, version }: { slug: string; version: string }) => (
+export const CopySvg = ({ slug, version }: { slug: string; version: string }) => (
   <Action
     title="Copy SVG"
     onAction={async () => {
@@ -20,7 +20,7 @@ export const CopySvgAction = ({ slug, version }: { slug: string; version: string
   />
 );
 
-export const OpenWithAction = ({ slug, version }: { slug: string; version: string }) => {
+export const OpenWith = ({ slug, version }: { slug: string; version: string }) => {
   const [destinationPath, setDestinationPath] = useState<string>("");
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export const OpenWithAction = ({ slug, version }: { slug: string; version: strin
   return destinationPath ? <Action.OpenWith path={destinationPath} /> : null;
 };
 
-export const SupportActions = () => (
+export const Supports = () => (
   <>
     <Action.OpenInBrowser
       title="Request a New Icon"
