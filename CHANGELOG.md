@@ -1,6 +1,6 @@
 # Simple Icons Changelog
 
-## [Improvements]
+## [Improvements] - 2024-03-07
 
 - Apply brand colors to grid view
 - Use Raycast built-in tint color API for icons in detail page
