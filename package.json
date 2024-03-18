@@ -19,8 +19,7 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.64.4",
-    "@raycast/utils": "1.12.4",
+    "@raycast/api": "1.69.3",
     "node-fetch": "3.3.2",
     "simple-icons": "11.4.0"
   },
